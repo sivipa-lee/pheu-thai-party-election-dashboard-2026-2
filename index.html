@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ผลเลือกตั้ง 2569 · พรรคเพื่อไทย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600&family=Prompt:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- LANDING PAGE -->
+<div id="landing-page">
+  <div class="land-bg"></div>
+  <div class="land-wrap">
+    <div class="land-left">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Pheu_Thai_Party_Logo_%282020%29.svg" class="land-logo" alt="พรรคเพื่อไทย" />
+      <div class="land-eyebrow">Interactive Election Analytics · 2569</div>
+      <h1 class="land-title">เพื่อไทย<br><span class="land-accent">เดินหน้าต่อ</span></h1>
+      <p class="land-desc">ระบบวิเคราะห์ผลการเลือกตั้งทั่วไป พ.ศ. 2569
+เพื่อสนับสนุนการตัดสินใจเชิงยุทธศาสตร์ของพรรคเพื่อไทย
+ในการระบุพื้นที่ฐานเสียงเดิม เขตแข่งขันสำคัญ และโอกาสในการขยายคะแนนเสียงสำหรับการเลือกตั้งครั้งถัดไป
+</p>
+
+      <div class="land-source">อ้างอิงผลนับคะแนนอย่างไม่เป็นทางการจาก กกต. · จัดทำเพื่อการวิเคราะห์และการศึกษา</div>
+    </div>
+    <div class="land-right">
+      <div class="land-cards">
+        <div class="land-card">
+          <div class="land-card-num">01</div>
+          <div><div class="land-card-title">ภาพรวมสนามเลือกตั้ง 69</div><div class="land-card-desc">สำรวจผลการเลือกตั้งปี 2569 เพื่อระบุพื้นที่ที่พรรคแข็งแกร่ง อ่อนแอ และการแข่งขันสูง</div></div>
+        </div>
+        <div class="land-card">
+          <div class="land-card-num">02</div>
+          <div><div class="land-card-title">เปรียบเทียบผลการเลือกตั้ง 66 vs 69</div><div class="land-card-desc">เปรียบเทียบผลเลือกตั้งปี 2566 และ 2569 เพื่อค้นหา swing districts และพื้นที่ที่คะแนนเปลี่ยนผิดปกติ</div></div>
+        </div>
+
+      </div>
+      <button class="land-cta" onclick="enterDashboard()">เริ่มสำรวจข้อมูล</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-shell">
+  <header class="site-header">
+    <div class="header-left">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Pheu_Thai_Party_Logo_%282020%29.svg" alt="พรรคเพื่อไทย" height="40" />
+      <div>
+        <h1>ผลเลือกตั้ง <span class="year">2569</span></h1>
+        <p class="sub">พรรคเพื่อไทย</p>
+      </div>
+    </div>
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="map">
+        <span class="tab-icon-svg"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 2L6 3.5V14L10 12.5V2Z" fill="currentColor" opacity="0.6"/><path d="M6 3.5L2 2V12.5L6 14V3.5Z" fill="currentColor"/><path d="M10 2L14 3.5V14L10 12.5V2Z" fill="currentColor" opacity="0.35"/></svg></span>
+        <span class="tab-label">ภาพรวมสนามเลือกตั้ง 69</span>
+      </button>
+      <button class="tab-btn" data-tab="analysis">
+        <span class="tab-icon-svg"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="9" width="3" height="6" rx="1" fill="currentColor" opacity="0.5"/><rect x="6" y="5" width="3" height="10" rx="1" fill="currentColor" opacity="0.75"/><rect x="11" y="1" width="3" height="14" rx="1" fill="currentColor"/></svg></span>
+        <span class="tab-label">เปรียบเทียบผลการเลือกตั้ง 66 vs 69</span>
+      </button>
+    </nav>
+    <div class="header-right">
+      <button class="hdr-btn hdr-tutorial" onclick="openTutorial()">วิธีใช้</button>
+    </div>
+  </header>
+
+  <!-- TAB: MAP -->
+  <div id="tab-map" class="tab-pane active">
+    <div class="body-layout">
+      <!-- DESKTOP SIDEBAR (hidden on mobile) -->
+      <aside class="sidebar sidebar-desktop" id="sidebar-map">
+        <button class="sidebar-toggle" id="toggle-map" onclick="toggleSidebar('map')" title="ซ่อน/แสดง Filter">
+          <span class="sidebar-toggle-icon">‹</span>
+        </button>
+
+        <!-- ตัวกรองหลัก -->
+        <div class="sidebar-category-header">
+          <span class="sidebar-category-label">ตัวกรองหลัก</span>
+          <span class="hint-anchor" data-hint="main-filters">?</span>
+        </div>
+        <div class="sidebar-section">
+          <p class="sidebar-label">ภาค</p>
+          <div class="dd-checkgroup" id="dd-region">
+            <label class="dd-item"><input type="checkbox" value="กรุงเทพมหานคร"> กรุงเทพมหานคร</label>
+            <label class="dd-item"><input type="checkbox" value="กลาง"> ภาคกลาง</label>
+            <label class="dd-item"><input type="checkbox" value="เหนือ"> ภาคเหนือ</label>
+            <label class="dd-item"><input type="checkbox" value="อีสาน"> ภาคอีสาน</label>
+            <label class="dd-item"><input type="checkbox" value="ตะวันออก"> ภาคตะวันออก</label>
+            <label class="dd-item"><input type="checkbox" value="ตะวันตก"> ภาคตะวันตก</label>
+            <label class="dd-item"><input type="checkbox" value="ใต้"> ภาคใต้</label>
+            <button class="clear-btn" data-target="regions">ล้างค่า</button>
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <p class="sidebar-label">ลักษณะประชากร <span class="hint-anchor" data-hint="demographics">?</span></p>
+          <div class="dd-checkgroup" id="dd-demo">
+            <label class="dd-item"><input type="checkbox" value="fv"> First Voter สูง</label>
+            <label class="dd-item"><input type="checkbox" value="z"> Gen Z สูง</label>
+            <label class="dd-item"><input type="checkbox" value="y"> Gen Y สูง</label>
+            <label class="dd-item"><input type="checkbox" value="x"> Gen X สูง</label>
+            <label class="dd-item"><input type="checkbox" value="senior"> ผู้สูงวัย สูง</label>
+            <p class="hint">*สูงกว่าค่าเฉลี่ยประเทศ</p>
+            <button class="clear-btn" data-target="demos">ล้างค่า</button>
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <p class="sidebar-label">รายได้เฉลี่ยจังหวัด (฿) <span class="hint-anchor" data-hint="income">?</span></p>
+          <div class="range-wrap">
+            <div class="range-track">
+              <div class="range-fill" id="range-fill-inc"></div>
+              <input type="range" id="f-inc-min" class="range-input" />
+              <input type="range" id="f-inc-max" class="range-input" />
+            </div>
+            <div class="range-values"><span id="range-val-inc-min">-</span><span id="range-val-inc-max">-</span></div>
+          </div>
+        </div>
+
+        <!-- ตัวกรอง แบ่งเขต/รายชื่อ -->
+        <div class="sidebar-category-header" id="cat-constp">
+          <span class="sidebar-category-label">ตัวกรอง แบ่งเขต / รายชื่อ</span>
+          <span class="hint-anchor" data-hint="const-filters">?</span>
+        </div>
+        <div class="sidebar-section" id="section-rank">
+          <p class="sidebar-label">อันดับเพื่อไทย</p>
+          <div class="dd-checkgroup" id="dd-rank">
+            <label class="dd-item"><input type="checkbox" value="1"> อันดับ 1 (ชนะ)</label>
+            <label class="dd-item"><input type="checkbox" value="2"> อันดับ 2</label>
+            <label class="dd-item"><input type="checkbox" value="3"> อันดับ 3 ขึ้นไป</label>
+            <button class="clear-btn" data-target="ranks">ล้างค่า</button>
+          </div>
+        </div>
+        <div class="sidebar-section" id="section-gap">
+          <p class="sidebar-label">ส่วนต่างคะแนน (%) <span class="hint-anchor" data-hint="gap">?</span></p>
+          <div class="range-wrap">
+            <div class="range-track">
+              <div class="range-fill" id="range-fill"></div>
+              <input type="range" id="f-gap-min" min="0" max="100" value="0" step="1" class="range-input" />
+              <input type="range" id="f-gap-max" min="0" max="100" value="100" step="1" class="range-input" />
+            </div>
+            <div class="range-values"><span id="range-val-min">0%</span><span id="range-val-max">100%</span></div>
+          </div>
+        </div>
+
+        <!-- ตัวกรองเปรียบเทียบ -->
+        <div class="sidebar-category-header" id="cat-compare" style="display:none">
+          <span class="sidebar-category-label">ตัวกรอง เปรียบเทียบ</span>
+          <span class="hint-anchor" data-hint="compare-filters">?</span>
+        </div>
+        <div class="sidebar-section" id="section-compare" style="display:none">
+          <p class="sidebar-label">ผลเปรียบเทียบ</p>
+          <div class="dd-checkgroup" id="dd-compare">
+            <label class="dd-item"><input type="checkbox" value="WW"> ชนะเขต / ชนะรายชื่อ</label>
+            <label class="dd-item"><input type="checkbox" value="WL"> ชนะเขต / แพ้รายชื่อ</label>
+            <label class="dd-item"><input type="checkbox" value="LW"> แพ้เขต / ชนะรายชื่อ</label>
+            <label class="dd-item"><input type="checkbox" value="LL"> แพ้เขต / แพ้รายชื่อ</label>
+            <button class="clear-btn" data-target="compare">ล้างค่า</button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-content" style="display:flex;flex-direction:row;gap:0;min-width:0">
+      <div class="map-area-wrap" style="flex:1;min-width:0;display:flex;flex-direction:column">
+        <!-- MODE BAR above map -->
+        <div class="mode-bar">
+          <span class="mode-bar-label">โหมดแสดงผล <span class="hint-anchor" data-hint="mode">?</span></span>
+          <div class="mode-toggle" id="mode-toggle">
+            <button class="mode-btn active" data-mode="const">แบ่งเขต</button>
+            <button class="mode-btn" data-mode="plist">บัญชีรายชื่อ</button>
+            <button class="mode-btn" data-mode="compare">เปรียบเทียบ</button>
+          </div>
+        </div>
+
+        <!-- MOBILE-ONLY FILTER BAR (hidden on desktop) -->
+        <div class="mobile-filter-bar" id="mobile-filter-bar">
+          <button class="mobile-filter-toggle" id="mobile-filter-toggle" onclick="toggleMobileFilters()">
+            <span class="mf-icon">⊞</span>
+            <span id="mobile-filter-label">ตัวกรอง</span>
+            <span class="mf-arrow open" id="mf-arrow">▾</span>
+          </button>
+          <div class="mobile-filter-panel" id="mobile-filter-panel" style="display:flex">
+            <!-- ภาค dropdown -->
+            <div class="mf-group">
+              <span class="mf-group-label">ภาค</span>
+              <div class="custom-dropdown" id="mob-dropdown-region">
+                <button class="dropdown-btn" onclick="toggleDropdown('mob-region')">
+                  <span id="dropdown-mob-region-label">ทุกภาค</span>
+                  <span class="dropdown-arrow">▾</span>
+                </button>
+                <div class="dropdown-content" id="dropdown-mob-region-content">
+                  <label><input type="checkbox" class="mob-region-cb" value="กรุงเทพมหานคร"> กรุงเทพมหานคร</label>
+                  <label><input type="checkbox" class="mob-region-cb" value="กลาง"> ภาคกลาง</label>
+                  <label><input type="checkbox" class="mob-region-cb" value="เหนือ"> ภาคเหนือ</label>
+                  <label><input type="checkbox" class="mob-region-cb" value="อีสาน"> ภาคอีสาน</label>
+                  <label><input type="checkbox" class="mob-region-cb" value="ตะวันออก"> ภาคตะวันออก</label>
+                  <label><input type="checkbox" class="mob-region-cb" value="ตะวันตก"> ภาคตะวันตก</label>
+                  <label><input type="checkbox" class="mob-region-cb" value="ใต้"> ภาคใต้</label>
+                  <div class="dropdown-clear-container"><button class="dropdown-clear" onclick="clearMobDropdown('region')">ล้างค่า</button></div>
+                </div>
+              </div>
+            </div>
+            <!-- ลักษณะประชากร dropdown -->
+            <div class="mf-group">
+              <span class="mf-group-label">ประชากร</span>
+              <div class="custom-dropdown" id="mob-dropdown-demo">
+                <button class="dropdown-btn" onclick="toggleDropdown('mob-demo')">
+                  <span id="dropdown-mob-demo-label">ทุกกลุ่ม</span>
+                  <span class="dropdown-arrow">▾</span>
+                </button>
+                <div class="dropdown-content" id="dropdown-mob-demo-content">
+                  <label><input type="checkbox" class="mob-demo-cb" value="fv"> First Voter สูง</label>
+                  <label><input type="checkbox" class="mob-demo-cb" value="z"> Gen Z สูง</label>
+                  <label><input type="checkbox" class="mob-demo-cb" value="y"> Gen Y สูง</label>
+                  <label><input type="checkbox" class="mob-demo-cb" value="x"> Gen X สูง</label>
+                  <label><input type="checkbox" class="mob-demo-cb" value="senior"> ผู้สูงวัย สูง</label>
+                  <div class="dropdown-clear-container"><button class="dropdown-clear" onclick="clearMobDropdown('demo')">ล้างค่า</button></div>
+                </div>
+              </div>
+            </div>
+            <!-- อันดับ (mode-dependent, hidden in compare) -->
+            <div class="mf-group mf-constp-only" id="mob-group-rank">
+              <span class="mf-group-label">อันดับ</span>
+              <div class="dd-checkgroup-inline" id="mob-dd-rank">
+                <label class="dd-item-inline"><input type="checkbox" class="mob-rank-cb" value="1"> ที่ 1</label>
+                <label class="dd-item-inline"><input type="checkbox" class="mob-rank-cb" value="2"> ที่ 2</label>
+                <label class="dd-item-inline"><input type="checkbox" class="mob-rank-cb" value="3"> 3+</label>
+              </div>
+            </div>
+            <!-- ส่วนต่างคะแนน -->
+            <div class="mf-group mf-constp-only" id="mob-group-gap">
+              <span class="mf-group-label">ส่วนต่าง <span class="hint-anchor" data-hint="gap">?</span></span>
+              <div class="mf-range-wrap">
+                <div class="range-track">
+                  <div class="range-fill" id="mob-range-fill"></div>
+                  <input type="range" id="mob-f-gap-min" min="0" max="100" value="0" step="1" class="range-input" />
+                  <input type="range" id="mob-f-gap-max" min="0" max="100" value="100" step="1" class="range-input" />
+                </div>
+                <div class="range-values"><span id="mob-range-val-min">0%</span><span id="mob-range-val-max">100%</span></div>
+              </div>
+            </div>
+            <!-- เปรียบเทียบ (only in compare mode) -->
+            <div class="mf-group mf-compare-only" id="mob-group-compare" style="display:none">
+              <span class="mf-group-label">ผลเปรียบเทียบ</span>
+              <div class="dd-checkgroup-inline" id="mob-dd-compare">
+                <label class="dd-item-inline"><input type="checkbox" class="mob-compare-cb" value="WW"> WW</label>
+                <label class="dd-item-inline"><input type="checkbox" class="mob-compare-cb" value="WL"> WL</label>
+                <label class="dd-item-inline"><input type="checkbox" class="mob-compare-cb" value="LW"> LW</label>
+                <label class="dd-item-inline"><input type="checkbox" class="mob-compare-cb" value="LL"> LL</label>
+              </div>
+            </div>
+            <!-- รายได้ -->
+            <div class="mf-group">
+              <span class="mf-group-label">รายได้ <span class="hint-anchor" data-hint="income">?</span></span>
+              <div class="mf-range-wrap">
+                <div class="range-track">
+                  <div class="range-fill" id="mob-range-fill-inc"></div>
+                  <input type="range" id="mob-f-inc-min" class="range-input" />
+                  <input type="range" id="mob-f-inc-max" class="range-input" />
+                </div>
+                <div class="range-values"><span id="mob-range-val-inc-min">-</span><span id="mob-range-val-inc-max">-</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row" id="stats-row"></div>
+
+        <div class="map-section">
+          <div class="legend" id="normal-legend" style="flex-direction:column;align-items:center;gap:10px">
+            <div style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:320px">
+              <div style="display:flex;justify-content:space-between;width:100%;margin-bottom:8px;font-weight:600;font-size:12px">
+                <span style="color:#003366">แพ้ (ขาด)</span>
+                <span style="color:#6c757d">สูสี</span>
+                <span style="color:#800000">ชนะ (ขาด)</span>
+              </div>
+              <div class="diverge-bar" style="width:100%"></div>
+            </div>
+          </div>
+          <div class="legend" id="compare-legend" style="display:none;gap:24px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid #f1f3f5">
+            <div class="legend-item">
+              <div class="tile-mock" style="background:#C72222;box-shadow:inset 0 0 0 5px #f47933"></div>
+              <span style="font-size:11px;line-height:1.4"><b>สีพื้น</b> = ชนะเขต &nbsp;|&nbsp; <b>สีกรอบ</b> = ชนะรายชื่อ</span>
+            </div>
+            <div id="dynamic-party-legend" style="display:flex;flex-wrap:wrap;gap:8px 16px"></div>
+          </div>
+
+          <!-- CONTEXTUAL COMPARE TUTORIAL -->
+          <div id="map-container">
+            <svg id="map-svg"><g id="map-g"></g></svg>
+            <div class="map-zoom-controls">
+              <button id="zoom-in" title="ซูมเข้า">+</button>
+              <button id="zoom-fit" title="Fit ทั้งหมด">&#8857;</button>
+              <button id="zoom-out" title="ซูมออก">&minus;</button>
+            </div>
+            <div class="map-hint">Scroll ซูม &middot; ลาก pan</div>
+          </div>
+
+        </div>
+      </div><!-- end map-area-wrap -->
+
+      </div><!-- end main-content flex -->
+    </div>
+
+    <footer class="source-footer">
+      <div class="source-inner">
+        <span class="source-title">แหล่งข้อมูล</span>
+        <span class="source-sep">|</span>
+        <span>ผลการเลือกตั้งทั่วไป พ.ศ. 2569: <b>กกต.</b> ผ่านระบบ ECT Report</span>
+        <span class="source-sep">&middot;</span>
+        <span>ข้อมูล OCR เสริม: <b>killernay/election-69-OCR-result</b> (GitHub)</span>
+        <span class="source-sep">&middot;</span>
+        <span class="source-status">อ้างอิงผลนับคะแนนอย่างไม่เป็นทางการ &mdash; บางส่วนผ่าน scrape/OCR/preprocessing อาจมีความคลาดเคลื่อน &mdash; จัดทำเพื่อการวิเคราะห์และการศึกษาเท่านั้น</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- TAB: ANALYSIS -->
+  <div id="tab-analysis" class="tab-pane" style="display:none">
+    <div class="body-layout">
+      <aside class="sidebar sidebar-desktop" id="sidebar-analysis">
+        <button class="sidebar-toggle" id="toggle-analysis" onclick="toggleSidebar('analysis')" title="ซ่อน/แสดง Filter">
+          <span class="sidebar-toggle-icon">‹</span>
+        </button>
+        <div class="sidebar-category-header">
+          <span class="sidebar-category-label">ตัวกรองหลัก</span>
+          <span class="hint-anchor" data-hint="analysis-filters">?</span>
+        </div>
+        <div class="sidebar-section">
+          <p class="sidebar-label">ภาค</p>
+          <div class="dd-checkgroup" id="dd-analysis-region">
+            <label class="dd-item"><input type="checkbox" class="a-region-cb" value="กรุงเทพมหานคร"> กรุงเทพมหานคร</label>
+            <label class="dd-item"><input type="checkbox" class="a-region-cb" value="กลาง"> ภาคกลาง</label>
+            <label class="dd-item"><input type="checkbox" class="a-region-cb" value="เหนือ"> ภาคเหนือ</label>
+            <label class="dd-item"><input type="checkbox" class="a-region-cb" value="อีสาน"> ภาคอีสาน</label>
+            <label class="dd-item"><input type="checkbox" class="a-region-cb" value="ตะวันออก"> ภาคตะวันออก</label>
+            <label class="dd-item"><input type="checkbox" class="a-region-cb" value="ตะวันตก"> ภาคตะวันตก</label>
+            <label class="dd-item"><input type="checkbox" class="a-region-cb" value="ใต้"> ภาคใต้</label>
+            <button class="clear-btn" onclick="clearAnalysisRegion()">ล้างค่า</button>
+          </div>
+        </div>
+        <div class="sidebar-category-header">
+          <span class="sidebar-category-label">สถานะเขต</span>
+          <span class="hint-anchor" data-hint="district-status">?</span>
+        </div>
+        <div class="sidebar-section">
+          <div class="dd-checkgroup" id="dd-analysis-status">
+            <label class="dd-item"><input type="checkbox" class="a-status-cb" value="รักษาแชมป์"><span class="status-dot" style="background:#1db741"></span> รักษาแชมป์</label>
+            <label class="dd-item"><input type="checkbox" class="a-status-cb" value="พลิกชนะ"><span class="status-dot" style="background:#cd3d3d"></span> พลิกชนะ</label>
+            <label class="dd-item"><input type="checkbox" class="a-status-cb" value="พลิกแพ้"><span class="status-dot" style="background:#3490f1"></span> พลิกแพ้</label>
+            <label class="dd-item"><input type="checkbox" class="a-status-cb" value="ไม่เคยชนะ"><span class="status-dot" style="background:#9ca3af"></span> ไม่เคยชนะ</label>
+            <button class="clear-btn" onclick="clearAnalysisStatus()">ล้างค่า</button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-content analysis-main">
+        <!-- MOBILE-ONLY FILTER BAR for analysis (hidden on desktop) -->
+        <div class="mobile-filter-bar" id="mobile-filter-bar-analysis">
+          <button class="mobile-filter-toggle" id="mobile-filter-toggle-analysis" onclick="toggleMobileFiltersAnalysis()">
+            <span class="mf-icon">⊞</span>
+            <span id="mobile-filter-label-analysis">ตัวกรอง</span>
+            <span class="mf-arrow open" id="mf-arrow-analysis">▾</span>
+          </button>
+          <div class="mobile-filter-panel" id="mobile-filter-panel-analysis" style="display:flex">
+            <!-- ภาค -->
+            <div class="mf-group">
+              <span class="mf-group-label">ภาค</span>
+              <div class="custom-dropdown" id="mob-dropdown-mob-analysis-region">
+                <button class="dropdown-btn" onclick="toggleDropdown('mob-analysis-region')">
+                  <span id="dropdown-mob-analysis-region-label">ทุกภาค</span>
+                  <span class="dropdown-arrow">▾</span>
+                </button>
+                <div class="dropdown-content" id="dropdown-mob-analysis-region-content">
+                  <label><input type="checkbox" class="mob-a-region-cb" value="กรุงเทพมหานคร"> กรุงเทพมหานคร</label>
+                  <label><input type="checkbox" class="mob-a-region-cb" value="กลาง"> ภาคกลาง</label>
+                  <label><input type="checkbox" class="mob-a-region-cb" value="เหนือ"> ภาคเหนือ</label>
+                  <label><input type="checkbox" class="mob-a-region-cb" value="อีสาน"> ภาคอีสาน</label>
+                  <label><input type="checkbox" class="mob-a-region-cb" value="ตะวันออก"> ภาคตะวันออก</label>
+                  <label><input type="checkbox" class="mob-a-region-cb" value="ตะวันตก"> ภาคตะวันตก</label>
+                  <label><input type="checkbox" class="mob-a-region-cb" value="ใต้"> ภาคใต้</label>
+                  <div class="dropdown-clear-container"><button class="dropdown-clear" onclick="clearMobAnalysisDropdown('region')">ล้างค่า</button></div>
+                </div>
+              </div>
+            </div>
+            <!-- สถานะเขต -->
+            <div class="mf-group">
+              <span class="mf-group-label">สถานะเขต</span>
+              <div class="dd-checkgroup-inline" id="mob-a-dd-status">
+                <label class="dd-item-inline"><input type="checkbox" class="mob-a-status-cb" value="รักษาแชมป์"><span class="status-dot" style="background:#1db741;margin-left:2px"></span> รักษาแชมป์</label>
+                <label class="dd-item-inline"><input type="checkbox" class="mob-a-status-cb" value="พลิกชนะ"><span class="status-dot" style="background:#cd3d3d;margin-left:2px"></span> พลิกชนะ</label>
+                <label class="dd-item-inline"><input type="checkbox" class="mob-a-status-cb" value="พลิกแพ้"><span class="status-dot" style="background:#3490f1;margin-left:2px"></span> พลิกแพ้</label>
+                <label class="dd-item-inline"><input type="checkbox" class="mob-a-status-cb" value="ไม่เคยชนะ"><span class="status-dot" style="background:#9ca3af;margin-left:2px"></span> ไม่เคยชนะ</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUMMARY ROW — top of analysis tab -->
+        <div class="analysis-stats-row" id="analysis-stats-row">
+          <div class="analysis-stat-card">
+            <div class="stat-label">เขตที่เพื่อไทยชนะปี 69</div>
+            <div class="stat-value" id="metric-win" style="color:#C72222">0</div>
+          </div>
+          <div class="analysis-stat-card">
+            <div class="stat-label">เขตที่พลิกชนะ</div>
+            <div class="stat-value" id="metric-flipped-win" style="color:#28a745">0</div>
+          </div>
+          <div class="analysis-stat-card">
+            <div class="stat-label">เขตที่พลิกแพ้</div>
+            <div class="stat-value" id="metric-flipped-lost" style="color:#3490f1">0</div>
+          </div>
+          <div class="analysis-stat-card">
+            <div class="stat-label">เขตที่วิเคราะห์</div>
+            <div class="stat-value" id="metric-total" style="color:#6b7280">0</div>
+          </div>
+        </div>
+
+        <h2 class="analysis-title">วิเคราะห์การเปลี่ยนแปลงที่นั่งของพรรคเพื่อไทย (ปี 66 vs 69)</h2>
+
+        <div class="card">
+          <div class="card-title-row">
+            <h3>ความสัมพันธ์คะแนนปี 66 และ 69</h3>
+            <span class="hint-anchor" data-hint="scatter">?</span>
+          </div>
+          <div class="caption">
+ทริค: สามารถลากครอบจุดเพื่อกรองข้อมูลได้
+          </div>
+          <div id="scatter-plot" style="width:100%;height:420px"></div>
+        </div>
+
+        <!-- DISTRICT LIST CARD -->
+        <div class="card" id="district-list-card">
+          <div class="card-title-row">
+            <h3 id="district-list-header">รายการเขตทั้งหมด 0 เขต</h3>
+          </div>
+          <div class="card">
+            <div class="caption">
+              <span style="color:#C72222">ค่าบวก (+) = เพื่อไทยชนะ</span> &nbsp;/&nbsp;
+              <span style="color:#1e64aa">ค่าลบ (−) = เพื่อไทยแพ้</span>
+          </div>
+          <div
+
+          <div id="district-list-container" style="overflow-x:auto">
+            <table class="district-table">
+              <thead>
+                <tr>
+                  <th>จังหวัด</th>
+                  <th style="text-align:center">เขต</th>
+                  <th style="text-align:right">ส่วนต่าง 66</th>
+                  <th style="text-align:right">ส่วนต่าง 69</th>
+                  <th style="text-align:center">เทียบ</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="district-list-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="analysis-row">
+          <div class="card" style="flex:3;min-width:300px">
+            <div class="card-title-row">
+              <h3>ทิศทางการเปลี่ยนแปลงของคะแนน</h3>
+              <span class="hint-anchor" data-hint="sankey">?</span>
+            </div>
+            <div class="caption">
+ทริค: วางเมาส์บนเส้นหรือโหนดเพื่อดูจำนวนเขตที่เปลี่ยนแปลง
+          </div>
+            <div id="sankey-diagram" style="width:100%;height:420px"></div>
+          </div>
+          <div class="card" style="flex:1;min-width:220px">
+            <h3>สรุปเพิ่มเติม</h3>
+            <div class="metrics-container">
+              <div class="metric-box" style="border-color:#C72222"><div style="font-size:13px">รักษาแชมป์</div><div class="metric-value" id="metric-keep">0</div></div>
+              <div class="metric-box" style="border-color:#28a745"><div style="font-size:13px">% ชนะ (จากทั้งหมด)</div><div class="metric-value" id="metric-win-pct">0%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title-row">
+            <h3>การพลิกโผ</h3>
+            <span class="hint-anchor" data-hint="flips">?</span>
+          </div>
+          <!-- Party color legend at top -->
+          <div id="flip-party-legend" class="flip-legend-bar"></div>
+          <div class="analysis-row">
+            <div style="flex:1;min-width:0">
+              <div class="flip-chart-label flip-lost-label">เสียให้ใคร</div>
+              <div id="hist-lost" style="height:300px"></div>
+    
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="flip-chart-label flip-won-label">แย่งใครมา</div>
+              <div id="hist-won" style="height:300px"></div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="source-footer">
+    <div class="source-inner">
+      <span class="source-title">แหล่งข้อมูล</span>
+      <span class="source-sep">|</span>
+      <span>ผลการเลือกตั้งทั่วไป พ.ศ. 2569: <b>กกต.</b> ผ่านระบบ ECT Report</span>
+      <span class="source-sep">&middot;</span>
+      <span>ข้อมูล OCR เสริม: <b>killernay/election-69-OCR-result</b> (GitHub)</span>
+      <span class="source-sep">&middot;</span>
+      <span class="source-status">อ้างอิงผลนับคะแนนอย่างไม่เป็นทางการ &mdash; บางส่วนผ่าน scrape/OCR/preprocessing อาจมีความคลาดเคลื่อน &mdash; จัดทำเพื่อการวิเคราะห์และการศึกษาเท่านั้น</span>
+    </div>
+  </footer>
+</div>
+
+<!-- TUTORIAL OVERLAY -->
+<div id="tutorial-overlay" style="display:none">
+  <div class="tut-backdrop" onclick="closeTutorial()"></div>
+  <div class="tut-panel">
+    <div class="tut-header">
+      <h2 class="tut-title">คู่มือการใช้งาน Dashboard</h2>
+      <button class="tut-close" onclick="closeTutorial()">&#10005;</button>
+    </div>
+    <div class="tut-body">
+
+      <!-- Page 1: Map tab -->
+      <div class="tut-section">
+        <div class="tut-section-icon">&#9654;</div>
+        <div>
+          <div class="tut-section-title">1 — ภาพรวมสนามเลือกตั้ง 69</div>
+          <div class="tut-section-desc">Tile Map รายเขตทั่วประเทศ — <b style="color:#C72222">สีแดง = เพื่อไทยชนะ</b>, <b style="color:#1e64aa">สีน้ำเงิน = เพื่อไทยแพ้</b> ความเข้มสีสะท้อนส่วนต่างคะแนน</div>
+        </div>
+      </div>
+      <div class="tut-steps">
+        <div class="tut-step"><div class="tut-step-num">1</div><div><b>โหมดแสดงผล</b> — เลือก <b>แบ่งเขต / บัญชีรายชื่อ / เปรียบเทียบ</b> ด้านบนแผนที่ ตัวกรองในแถบซ้ายจะปรับตามโหมดโดยอัตโนมัติ</div></div>
+        <div class="tut-step"><div class="tut-step-num">2</div><div><b>ตัวกรองหลัก</b> — กรอง ภาค, ลักษณะประชากร และรายได้จังหวัด ใช้ได้กับทุกโหมด เขตที่ไม่ตรงเงื่อนไขจะจางลง</div></div>
+        <div class="tut-step"><div class="tut-step-num">3</div><div><b>ตัวกรอง แบ่งเขต/รายชื่อ</b> — กรองอันดับเพื่อไทย และส่วนต่างคะแนน (%) ใช้งานได้ในโหมดแบ่งเขตและบัญชีรายชื่อ</div></div>
+        <div class="tut-step"><div class="tut-step-num">4</div><div><b>ตัวกรอง เปรียบเทียบ</b> — กรองตามผลรวม เขต+รายชื่อ (WW/WL/LW/LL) ปรากฏเฉพาะโหมดเปรียบเทียบ</div></div>
+        <div class="tut-step"><div class="tut-step-num">5</div><div><b>Tooltip</b> — วางเมาส์บนกล่องเขตเพื่อดูรายละเอียดเต็ม (คะแนน, พรรค, ส่วนต่าง, ประชากร)</div></div>
+        <div class="tut-step"><div class="tut-step-num">6</div><div><b>Zoom / Pan</b> — Scroll ซูม, ลากเลื่อน หรือใช้ปุ่ม +/−/⊙ มุมขวาล่างแผนที่</div></div>
+      </div>
+
+      <div class="tut-divider"></div>
+
+      <!-- Page 2: Analysis tab -->
+      <div class="tut-section">
+        <div class="tut-section-icon">&#9654;</div>
+        <div>
+          <div class="tut-section-title">แท็บที่ 2 — เปรียบเทียบผลการเลือกตั้ง 66 vs 69</div>
+          <div class="tut-section-desc">กราฟ Interactive 3 ชิ้นที่เชื่อมกัน (Linked Views) — เลือกจุดในกราฟหนึ่ง กราฟอื่นอัพเดทอัตโนมัติ</div>
+        </div>
+      </div>
+      <div class="tut-steps">
+        <div class="tut-step"><div class="tut-step-num">7</div><div><b>Scatter Plot</b> — แกน X = คะแนน% ปี 66, แกน Y = คะแนน% ปี 69 จุดเหนือเส้นทแยงมุม = คะแนนดีขึ้น <b>ลากครอบ (Lasso)</b> เพื่อกรองกราฟอื่น</div></div>
+        <div class="tut-step"><div class="tut-step-num">8</div><div><b>Sankey Diagram</b> — แสดงทิศทางการเปลี่ยนผู้ชนะจาก 66 → 69 วางเมาส์บนเส้นหรือโหนดเพื่อดูจำนวนเขต</div></div>
+        <div class="tut-step"><div class="tut-step-num">9</div><div><b>กราฟการพลิกโผ</b> — ซ้าย: เขตที่เพื่อไทยพลิกแพ้ (แบ่งตามพรรคที่ชนะ) ขวา: เขตที่เพื่อไทยพลิกชนะ (แบ่งตามพรรคที่แพ้)</div></div>
+        <div class="tut-step"><div class="tut-step-num">10</div><div><b>Sidebar Filter</b> — กรองภาคและสถานะเขต กราฟทั้ง 3 ชิ้นและตัวเลขสรุปด้านบนอัพเดทพร้อมกัน</div></div>
+      </div>
+
+      <div class="tut-divider"></div>
+
+      <!-- Page 3: Compare Map Guide -->
+      <div class="tut-section">
+        <div class="tut-section-icon">&#9654;</div>
+        <div>
+          <div class="tut-section-title">วิธีอ่านแผนที่ "โหมดเปรียบเทียบ"</div>
+          <div class="tut-section-desc">โหมดนี้แสดงผลทั้ง <b>แบ่งเขต</b> และ <b>บัญชีรายชื่อ</b> พร้อมกันในกล่องเดียว โดยใช้ 2 สี</div>
+        </div>
+      </div>
+      <div class="tut-compare-legend-demo">
+        <div class="tut-compare-row">
+          <div class="tut-tile-demo" style="background:#C72222;box-shadow:inset 0 0 0 5px #C72222"></div>
+          <div class="tut-compare-explain">
+            <b>สีพื้นและสีกรอบเหมือนกัน</b><br>
+            <span>ตัวอย่าง: พื้น = แดง, กรอบ = แดง → <span style="color:#C72222">เพื่อไทยชนะทั้งแบ่งเขตและบัญชีรายชื่อ (WW)</span></span>
+          </div>
+        </div>
+        <div class="tut-compare-row">
+          <div class="tut-tile-demo" style="background:#C72222;box-shadow:inset 0 0 0 5px #f47933"></div>
+          <div class="tut-compare-explain">
+            <b>สีพื้น ≠ สีกรอบ</b><br>
+            <span>ตัวอย่าง: พื้น = แดง (เพื่อไทยชนะเขต), กรอบ = ส้ม (ประชาชนชนะรายชื่อ) → <span style="color:#e8a020">ชนะเขต แต่แพ้รายชื่อ (WL)</span></span>
+          </div>
+        </div>
+        <div class="tut-compare-row">
+          <div class="tut-tile-demo" style="background:#243273;box-shadow:inset 0 0 0 5px #C72222"></div>
+          <div class="tut-compare-explain">
+            <b>กรอบแดง หมายความว่าอะไร?</b><br>
+            <span>ตัวอย่าง: พื้น = น้ำเงิน (ภูมิใจไทยชนะเขต), กรอบ = แดง (เพื่อไทยชนะรายชื่อ) → <span style="color:#243273">แพ้เขต แต่ชนะรายชื่อ (LW)</span></span>
+          </div>
+        </div>
+        <div class="tut-compare-summary">
+          <div class="tut-compare-key"><span class="tut-compare-dot" style="background:#C72222"></span><b>สีพื้น</b> = พรรคที่ชนะ สส. แบ่งเขต</div>
+          <div class="tut-compare-key"><span class="tut-compare-border-dot"></span><b>สีกรอบ</b> = พรรคที่ชนะ สส. บัญชีรายชื่อ (ในเขตนั้น)</div>
+        </div>
+      </div>
+
+      <div class="tut-tip">ทุก section มีปุ่ม <span class="hint-badge">?</span> สีแดงให้คลิกดูคำอธิบายเพิ่มเติมได้ตลอดเวลา โดยไม่ต้องเปิดคู่มือนี้ใหม่</div>
+    </div>
+    <div class="tut-footer">
+      <button class="tut-ok" onclick="closeTutorial()">เข้าใจแล้ว เริ่มใช้งาน</button>
+    </div>
+  </div>
+</div>
+
+<!-- SOURCE OVERLAY -->
+<div id="source-overlay" style="display:none">
+  <div class="tut-backdrop" onclick="closeSource()"></div>
+  <div class="tut-panel" style="max-width:560px">
+    <div class="tut-header">
+      <h2 class="tut-title">แหล่งข้อมูล</h2>
+      <button class="tut-close" onclick="closeSource()">&#10005;</button>
+    </div>
+    <div class="tut-body">
+      <div class="tut-section">
+        <div class="tut-section-icon">&#128203;</div>
+        <div>
+          <div class="tut-section-title">ผลการเลือกตั้งทั่วไป พ.ศ. 2569</div>
+          <div class="tut-section-desc">คณะกรรมการการเลือกตั้ง (กกต.) ผ่านระบบ ECT Report &mdash; ผลนับคะแนนอย่างไม่เป็นทางการ</div>
+        </div>
+      </div>
+      <div class="tut-section">
+        <div class="tut-section-icon">&#128187;</div>
+        <div>
+          <div class="tut-section-title">ข้อมูล OCR เสริม</div>
+          <div class="tut-section-desc">killernay/election-69-OCR-result (GitHub) &mdash; ข้อมูลบางส่วนผ่านกระบวนการ scrape / OCR / preprocessing อาจมีความคลาดเคลื่อน</div>
+        </div>
+      </div>
+      <div class="tut-section">
+        <div class="tut-section-icon">&#128101;</div>
+        <div>
+          <div class="tut-section-title">ข้อมูลประชากรและรายได้</div>
+          <div class="tut-section-desc">สัดส่วน Gen Z/Y/X/Senior จากข้อมูลผู้มีสิทธิ์เลือกตั้ง &middot; รายได้เฉลี่ยจังหวัดจาก NESDC/สภาพัฒน์</div>
+        </div>
+      </div>
+      <div class="tut-section">
+        <div class="tut-section-icon">&#9888;</div>
+        <div>
+          <div class="tut-section-title">ข้อควรระวัง</div>
+          <div class="tut-section-desc">ข้อมูลทั้งหมดจัดทำเพื่อการวิเคราะห์และการศึกษาเท่านั้น ไม่ใช่ผลอย่างเป็นทางการ</div>
+        </div>
+      </div>
+    </div>
+    <div class="tut-footer">
+      <button class="tut-ok" onclick="closeSource()">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXTUAL HINT POPOVER -->
+<div id="hint-popover" style="display:none">
+  <div class="hint-pop-inner">
+    <button class="hint-pop-close" onclick="closeHint()">&#10005;</button>
+    <div id="hint-pop-content"></div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+<div id="loading-overlay"><div class="spinner"></div><p>กำลังโหลดข้อมูล...</p></div>
+
+<script src="script.js"></script>
+</body>
+</html>
